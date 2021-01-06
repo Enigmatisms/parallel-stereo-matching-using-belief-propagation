@@ -1,15 +1,12 @@
-﻿#pragma once
+#pragma once
 
 #include <vector>
 
 #include <opencv2/opencv.hpp>
 
-using namespace std;
-using namespace cv;
-
 enum Direction { Left, Right, Up, Down, Data };
 
-typedef unsigned int msg_t;
+typedef double msg_t;
 typedef unsigned int energy_t;
 typedef unsigned int smoothness_cost_t;
 typedef unsigned int data_cost_t;
@@ -28,15 +25,16 @@ struct MarkovRandomFieldParam {
 };
 
 struct MarkovRandomField {
-	vector<MarkovRandomFieldNode> grid;
+	std::vector<MarkovRandomFieldNode> grid;
 	MarkovRandomFieldParam param;
 	int height, width;
 };
 
-void initializeMarkovRandomField(MarkovRandomField& mrf, string leftImgPath, string rightImgPath, MarkovRandomFieldParam param);
+void destroyMRF(MarkovRandomField& mrf);
+void initializeMarkovRandomField(MarkovRandomField& mrf, std::string leftImgPath, std::string rightImgPath, MarkovRandomFieldParam param);
 void sendMsg(MarkovRandomField& mrf, int x, int y, Direction dir);
 void beliefPropagation(MarkovRandomField& mrf, Direction dir);
-energy_t calculateMaxPosteriorProbability(MarkovRandomField& mrf);
+energy_t calculateMaxPosteriorProbability(MarkovRandomField& mrf, int iter);
 
-data_cost_t calculateDataCost(Mat& leftImg, Mat& rightImg, int x, int y, int disparity);
+data_cost_t calculateDataCost(const cv::Mat& leftImg, const cv::Mat& rightImg, int x, int y, int disparity);
 smoothness_cost_t calculateSmoothnessCost(int i, int j, int lambda, int smoothnessParam);
